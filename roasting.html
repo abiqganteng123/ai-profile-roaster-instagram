@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Instagram Profile Roaster</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --accent: #fd79a8;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+            --card-bg: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #2d3436 0%, #000000 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* SIDEBAR STYLES */
+        .sidebar {
+            width: 280px;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            position: fixed;
+            left: -280px;
+            top: 0;
+            bottom: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1000;
+            overflow-y: auto;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-title {
+            font-size: 1.3rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .close-sidebar {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .close-sidebar:hover {
+            transform: rotate(90deg);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar-menu a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-menu a:hover {
+            background: rgba(108, 92, 231, 0.3);
+            transform: translateX(8px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-menu i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .sidebar-content {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #ccc;
+        }
+
+        .sidebar-content h3 {
+            color: var(--secondary);
+            margin-bottom: 15px;
+            font-size: 1rem;
+            position: relative;
+            padding-left: 10px;
+        }
+
+        .sidebar-content h3::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 5px;
+            height: 15px;
+            width: 3px;
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        .sidebar-content p {
+            margin-bottom: 15px;
+            padding-left: 10px;
+        }
+
+        .whatsapp-contact {
+            background: rgba(37, 211, 102, 0.15);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 25px;
+            border-left: 3px solid #25D366;
+            transition: transform 0.3s;
+        }
+
+        .whatsapp-contact:hover {
+            transform: translateY(-3px);
+        }
+
+        .whatsapp-contact h3 {
+            color: #25D366 !important;
+        }
+
+        .menu-toggle {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 900;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+        }
+
+        .menu-toggle:hover {
+            transform: scale(1.1);
+            background: var(--accent);
+        }
+
+        /* MAIN CONTENT STYLES */
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            transition: all 0.4s;
+            position: relative;
+            z-index: 1;
+        }
+
+        .sidebar.active ~ .container {
+            transform: translateX(140px);
+            filter: blur(2px);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px rgba(108, 92, 231, 0.5); }
+            to { text-shadow: 0 0 20px rgba(253, 121, 168, 0.8); }
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            font-style: italic;
+        }
+
+        .roast-box {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            margin-bottom: 2rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .roast-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .upload-area {
+            border: 2px dashed var(--secondary);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area:hover {
+            border-color: var(--accent);
+            background: rgba(162, 155, 254, 0.1);
+        }
+
+        .upload-area i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            transition: transform 0.3s;
+        }
+
+        .upload-area:hover i {
+            transform: scale(1.1);
+            color: var(--accent);
+        }
+
+        #preview-container {
+            display: none;
+            margin: 1.5rem 0;
+            text-align: center;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        #image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: 2px solid var(--primary);
+            transition: transform 0.3s;
+        }
+
+        #image-preview:hover {
+            transform: scale(1.02);
+        }
+
+        button {
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 0 auto;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+            width: 100%;
+            max-width: 300px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 7px 20px rgba(253, 121, 168, 0.6);
+        }
+
+        button:disabled {
+            background: #636e72;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .result {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1.5rem;
+            border-radius: 15px;
+            border-left: 4px solid var(--accent);
+            margin-top: 2rem;
+            animation: fadeIn 0.8s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(253, 121, 168, 0.05), transparent);
+            pointer-events: none;
+        }
+
+        .result h3 {
+            margin-bottom: 1rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .result p {
+            line-height: 1.7;
+            font-size: 1.05rem;
+            animation: textAppear 0.5s ease-out;
+        }
+
+        @keyframes textAppear {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 1.5rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--accent);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            color: #ff7675;
+            margin-top: 1rem;
+            text-align: center;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: #636e72;
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ANIMATIONS FOR AI RESPONSE */
+        @keyframes party {
+            0% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-5px) rotate(2deg); }
+            50% { transform: translateY(0) rotate(0deg); }
+            75% { transform: translateY(-5px) rotate(-2deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+
+        .party-time {
+            animation: party 0.5s ease 3;
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: var(--accent);
+            opacity: 0;
+            z-index: 1000;
+            animation: confettiDrop 3s ease-out forwards;
+        }
+
+        @keyframes confettiDrop {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .roast-box {
+                padding: 1.5rem;
+            }
+            
+            button {
+                padding: 12px 25px;
+            }
+
+            .sidebar.active ~ .container {
+                transform: translateX(100px);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .sidebar {
+                width: 250px;
+            }
+            
+            .sidebar.active ~ .container {
+                transform: translateX(80px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Menu Gweh</div>
+            <button class="close-sidebar" id="close-sidebar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li>
+                <a href="#" id="home-btn">
+                    <i class="fas fa-home"></i>
+                    <span>Homepage</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" id="about-btn">
+                    <i class="fas fa-info-circle"></i>
+                    <span>About</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" id="bug-btn">
+                    <i class="fas fa-bug"></i>
+                    <span>Lapor Bug</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" id="help-btn">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Cara Pakai</span>
+                </a>
+            </li>
+        </ul>
+        
+        <div class="sidebar-content">
+            <h3>About</h3>
+            <p>Ini tuh tools buat roast profil IG lu pake AI. Keren kan? Tinggal upload screenshot, ntar AI bakal ngasih roast yang bikin lu ngakak sekaligus nangis bombay! 😂🔥</p>
+            
+            <h3>Cara Pakai</h3>
+            <p>1. Screenshot profil IG target (bisa mantan, gebetan, atau musuh lu)<br>
+            2. Upload sini<br>
+            3. Dengerin AI ngeledek mereka sepuasnya<br>
+            4. Kirim hasilnya ke mereka biar mampus! 🤡</p>
+            
+            <div class="whatsapp-contact">
+                <h3>Ada Masalah? Japri Gweh!</h3>
+                <p><i class="fab fa-whatsapp"></i> WhatsApp: +44 7405258579</p>
+                <p>Jangan malu-malu kalo ada bug, langsung japri aja ya bro!</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MAIN CONTENT -->
+    <button class="menu-toggle" id="menu-toggle">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <div class="container">
+        <header>
+            <h1>Instagram Roaster AI</h1>
+            <p class="tagline">Upload screenshot profil Instagram buat diroast abis-abisan!</p>
+        </header>
+        
+        <div class="roast-box">
+            <div id="upload-area" class="upload-area">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Seret & lepas screenshot profil IG sini</p>
+                <small>Atau klik buat milih file</small>
+                <input type="file" id="file-input" accept="image/*" style="display: none;">
+            </div>
+            
+            <div id="preview-container">
+                <img id="image-preview" src="#" alt="Preview Gambar">
+            </div>
+            
+            <button id="roast-btn" disabled>
+                <i class="fas fa-magic"></i> Gaskeun Roast!
+            </button>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>AI lagi ngumpulin bahan buat Ngeledekin... sabar ya bro!</p>
+            </div>
+            
+            <div class="result" id="result" style="display: none;">
+                <h3><i class="fas fa-robot"></i> Hasil Roast Ganas:</h3>
+                <p id="roast-result"></p>
+            </div>
+            
+            <div id="error-message" class="error"></div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2025 AI Profile Roaster By Abiq| Powered by Gemini 1.5 Flash | Bikin ngakak sampe mampus! 😂💀</p>
+        </div>
+    </div>
+
+    <script>
+        const API_KEY = "AIzaSyCcftoJg1LVs97g2OUtYdlcTM9B3RHpOm4";
+        const roastBtn = document.getElementById('roast-btn');
+        const fileInput = document.getElementById('file-input');
+        const uploadArea = document.getElementById('upload-area');
+        const previewContainer = document.getElementById('preview-container');
+        const imagePreview = document.getElementById('image-preview');
+        const roastResult = document.getElementById('roast-result');
+        const loading = document.getElementById('loading');
+        const resultDiv = document.getElementById('result');
+        const errorMessage = document.getElementById('error-message');
+        const sidebar = document.getElementById('sidebar');
+        const menuToggle = document.getElementById('menu-toggle');
+        const closeSidebar = document.getElementById('close-sidebar');
+        const bugBtn = document.getElementById('bug-btn');
+
+        // Sidebar toggle
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+
+        closeSidebar.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+        });
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!sidebar.contains(e.target) && e.target !== menuToggle) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // WhatsApp bug report
+        bugBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const phoneNumber = "+447405258579";
+            const message = encodeURIComponent("Woy bangke ada bug nih! \n\nJelasin bugnya: [isi disini ya bro] \n\nTerjadi pas: [kondisi pas bug muncul]");
+            window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+        });
+
+        // Handle drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = 'var(--accent)';
+            uploadArea.style.background = 'rgba(162, 155, 254, 0.2)';
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = 'var(--secondary)';
+            uploadArea.style.background = 'transparent';
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = 'var(--secondary)';
+            uploadArea.style.background = 'transparent';
+            
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileSelect();
+            }
+        });
+
+        // Handle file selection
+        uploadArea.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleFileSelect);
+
+        function handleFileSelect() {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            if (!file.type.match('image.*')) {
+                showError('Cuma bisa gambar doang bro, jangan ngadi-ngadi upload file aneh!');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.src = e.target.result;
+                previewContainer.style.display = 'block';
+                roastBtn.disabled = false;
+                errorMessage.textContent = '';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Handle roast button click
+        roastBtn.addEventListener('click', async () => {
+            const file = fileInput.files[0];
+            if (!file) {
+                showError('Woi upload dulu gambarnya, jangan asal pencet!');
+                return;
+            }
+
+            loading.style.display = 'block';
+            resultDiv.style.display = 'none';
+            errorMessage.textContent = '';
+
+            try {
+                const base64 = await toBase64(file);
+                const response = await analyzeWithGemini(base64, file.type);
+                roastResult.textContent = response;
+                resultDiv.style.display = 'block';
+                
+                // Celebration animation
+                celebrate();
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Gagal ngeroast nih: ' + (error.message || 'Coba lagi ya bro, mungkin lagi sial'));
+            } finally {
+                loading.style.display = 'none';
+            }
+        });
+
+        // Celebration animation
+        function celebrate() {
+            // Add party animation to result
+            resultDiv.classList.add('party-time');
+            
+            // Create confetti
+            createConfetti();
+            
+            // Remove animation after it completes
+            setTimeout(() => {
+                resultDiv.classList.remove('party-time');
+            }, 1500);
+        }
+
+        function createConfetti() {
+            const colors = ['#fd79a8', '#6c5ce7', '#00b894', '#fdcb6e', '#e17055'];
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = Math.random() * 10 + 5 + 'px';
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                document.body.appendChild(confetti);
+                
+                // Remove confetti after animation
+                setTimeout(() => {
+                    confetti.remove();
+                }, 3000);
+            }
+        }
+
+        // Convert file to base64
+        function toBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // Analyze with Gemini 1.5 Flash
+        async function analyzeWithGemini(base64, mimeType) {
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+            
+            const prompt = `Bikin roast kocak banget dalam bahasa gaul Jakarta yang beneran nyakitin tapi lucu! Analisis screenshot profil IG ini dan:
+
+1. TEBAK JUMLAH FOLLOWER (lihat dari engagement & kualitas konten):
+   - Kalo follower gede tapi engagement dikit: "Buset beli follower ya? Ketauan banget dah ratio like-nya wkwk"
+   - Kalo follower kecil: "Waduh sepi banget sih ini, kayak warung kopi jam 3 pagi 😂"
+
+2. LEDAKIN SEMUA KEANEHAN:
+   - Kalo isinya selfie mulu: "Diem-diem narsis, kamera sampe keringetan nih"
+   - Kalo fotonya aesthetic banget: "Jangan-jangan hidupnya gak sebagus feed 💀"
+   - Kalo isinya quotes motivasi: "Dikit-dikit quotes, kaya hidup lo sempurna banget?"
+
+3. SPESIFIK KE KONTEN:
+   - Kalo engagement rendah: "Posting mulu tapi yang like cuma bot sama mantan doang ya? 😂"
+   - Kalo over-posting: "Kamu sama IG ini kaya anak baru jadian, tiap jam update story 💀"
+
+4. PAKE BAHASA GAUL EXTREME:
+   - "Anjirr ini captionnya... dikit-dikit deep, dikit-dikit galau, dikit-dikit bahlul!"
+   - "Buset dah feed lo isinya kayak menu McD - itu-itu mulu 😂"
+
+5. KASIH RATING KOCAK:
+   - "Ni profil level 99 norak dah!"
+   - "Kalo norak itu olahraga, lo juara dunia 💯"
+
+6. PAKE EMOJI 🔥😂💀🤡 biar makin greget
+
+Contoh gaya:
+"NJIRR 💀 follower 10K tapi yang like cuma 20? Ketauan belinya di Pasar Senen ya? 🤡 Postingannya aesthetic sih, tapi kaya bungkus permen - luarnya manis dalemnya kosong wkwk 😂🔥"
+
+Sekarang bikin roast yang lebih sadis dan spesifik!`;
+
+            const requestBody = {
+                contents: [{
+                    parts: [
+                        { text: prompt },
+                        {
+                            inlineData: {
+                                mimeType: mimeType,
+                                data: base64
+                            }
+                        }
+                    ]
+                }],
+                generationConfig: {
+                    temperature: 0.7,
+                    topP: 0.9,
+                    maxOutputTokens: 300
+                },
+                safetySettings: [
+                    {
+                        category: "HARM_CATEGORY_HARASSMENT",
+                        threshold: "BLOCK_ONLY_HIGH"
+                    }
+                ]
+            };
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error?.message || 'Gagal memproses gambar');
+            }
+
+            if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
+                throw new Error('Tidak mendapatkan hasil analisis');
+            }
+
+            return data.candidates[0].content.parts[0].text;
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            setTimeout(() => {
+                errorMessage.textContent = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
